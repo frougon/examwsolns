@@ -1,0 +1,335 @@
+% examwsolns.sty --- Environment for typesetting solutions with autodetected
+%                    or customizable indentation level
+% -*- coding: utf-8 -*-
+%
+% Copyright (C) 2019  Florent Rougon
+%
+% This work may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2005/12/01 or later.
+%
+% This work has the LPPL maintenance status `maintained'.
+%
+% The Current Maintainer of this work is Florent Rougon.
+%
+% This work consists of the sole files examwsolns.sty, README.md and all
+% files from the 'examples' directory.
+%
+% This package provides a 'wsolution' environment for the 'exam' class. See
+% the README.md file for details.
+%
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\RequirePackage{expl3}
+\RequirePackage{xparse}
+\RequirePackage{l3keys2e}
+% 'environ' won't be needed anymore when we can use xparse from 2019-03-05.
+\RequirePackage{environ}
+
+\ProvidesExplPackage{examwsolns}{2019-05-07}{0.1}
+                    {Environment for typesetting solutions with autodetected
+                     or customizable indentation level}
+
+% ****************************************************************************
+% *                     Messages emitted by the package                      *
+% ****************************************************************************
+\msg_new:nnn { examwsolns } { invalid-question-level-name }
+  { Invalid~question~level~name:~' \exp_not:n {#1} '. }
+\msg_new:nnn { examwsolns } { invalid-question-level-num }
+  { Invalid~question~level~number:~' \exp_not:n {#1} '. }
+
+% Variable declarations
+\dim_new:N \g_examwsolns_outer_indent_dim
+\dim_new:N \g_examwsolns_question_indent_dim
+\dim_new:N \g_examwsolns_part_indent_dim
+\dim_new:N \g_examwsolns_subpart_indent_dim
+\dim_new:N \g_examwsolns_subsubpart_indent_dim
+\tl_new:N \l_examwsolns_mdframed_default_args_tl
+
+% For each question level, compute the indentation starting from the left
+% margin based on the label widths used in exam.cls.
+%
+% First: by definition, there is no indentation at all at outer level.
+\dim_zero:N \g_examwsolns_outer_indent_dim
+
+\hbox_set:Nn \l_tmpa_box { 10. \skip_horizontal:N \labelsep }
+
+% \labelindent = total indentation for the 'question' level
+\dim_set:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
+
+\dim_gset_eq:NN \g_examwsolns_question_indent_dim \l_tmpa_dim
+
+% Compute total indentation (from the left margin) for question level 'part'
+\hbox_set:Nn \l_tmpa_box { (m) \skip_horizontal:N \labelsep }
+\dim_add:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
+\dim_gset_eq:NN \g_examwsolns_part_indent_dim \l_tmpa_dim
+
+% Compute total indentation (from the left margin) for question level 'subpart'
+\hbox_set:Nn \l_tmpa_box { vii. \skip_horizontal:N \labelsep }
+\dim_add:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
+\dim_gset_eq:NN \g_examwsolns_subpart_indent_dim \l_tmpa_dim
+
+% Compute total indentation (from the left margin) for question level
+% 'subsubpart'
+\hbox_set:Nn \l_tmpa_box { ($\psi$) \skip_horizontal:N \labelsep }
+\dim_add:Nn \l_tmpa_dim { \box_wd:N \l_tmpa_box }
+\dim_gset_eq:NN \g_examwsolns_subsubpart_indent_dim \l_tmpa_dim
+
+% Make these computed <dimen> user-accessible
+\cs_gset_eq:NN \examwsolnsOuterIndent \g_examwsolns_outer_indent_dim
+\cs_gset_eq:NN \examwsolnsQuestionIndent \g_examwsolns_question_indent_dim
+\cs_gset_eq:NN \examwsolnsPartIndent \g_examwsolns_part_indent_dim
+\cs_gset_eq:NN \examwsolnsSubpartIndent \g_examwsolns_subpart_indent_dim
+\cs_gset_eq:NN \examwsolnsSubsubpartIndent \g_examwsolns_subsubpart_indent_dim
+
+% Expand to the numeric question level for outer, question, part, subpart or
+% subsubpart ('outer' being a pseudo-question level). Fully expandable.
+\cs_new:Npn \examwsolns_level_for_name:n #1
+  {
+    \str_case:nn {#1}
+      {
+        { outer }      { 0 }
+        { question }   { 1 }
+        { part }       { 2 }
+        { subpart }    { 3 }
+        { subsubpart } { 4 }
+      }
+  }
+
+\cs_generate_variant:Nn \examwsolns_level_for_name:n { V }
+
+\cs_new_protected:Npn \examwsolns_level_for_name_with_check:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { outer }      { 0 }
+        { question }   { 1 }
+        { part }       { 2 }
+        { subpart }    { 3 }
+        { subsubpart } { 4 }
+      }
+      { \msg_error:nnn { examwsolns } { invalid-question-level-name } {#1} }
+  }
+
+\cs_new_protected:Npn \examwsolns_check_question_level_name:n #1
+  {
+    \str_case:nnF {#1}
+      {
+        { outer }      { }
+        { question }   { }
+        { part }       { }
+        { subpart }    { }
+        { subsubpart } { }
+      }
+      { \msg_error:nnn { examwsolns } { invalid-question-level-name } {#1} }
+  }
+
+\cs_generate_variant:Nn \examwsolns_check_question_level_name:n { x }
+
+% Expand to the question level name for the given numeric question level.
+% Fully expandable.
+\cs_new:Npn \examwsolns_name_for_level:n #1
+  {
+    \int_case:nn {#1}
+      {
+        { 0 } { outer }
+        { 1 } { question }
+        { 2 } { part }
+        { 3 } { subpart }
+        { 4 } { subsubpart }
+      }
+  }
+
+\cs_new_protected:Npn \examwsolns_name_for_level_with_check:n #1
+  {
+    \int_case:nnF {#1}
+      {
+        { 0 } { outer }
+        { 1 } { question }
+        { 2 } { part }
+        { 3 } { subpart }
+        { 4 } { subsubpart }
+      }
+      { \msg_error:nnn { examwsolns } { invalid-question-level-num } {#1} }
+  }
+
+\cs_new_protected:Npn \examwsolns_check_question_level_num:n #1
+  {
+    \int_case:nnF {#1}
+      {
+        { 0 } { }
+        { 1 } { }
+        { 2 } { }
+        { 3 } { }
+        { 4 } { }
+      }
+      { \msg_error:nnn { examwsolns } { invalid-question-level-num } {#1} }
+  }
+
+\cs_generate_variant:Nn \examwsolns_check_question_level_num:n { x }
+
+\cs_new_protected:Npn \examwsolns_total_indent_for_level_name:n #1
+  {
+    \examwsolns_check_question_level_name:n {#1}
+    \use:c { g_examwsolns_#1_indent_dim }
+  }
+
+% Expand to a <dimension>. Fully expandable, but doesn't check whether the
+% question level is valid.
+\cs_new_protected:Npn \examwsolns_total_indent_for_level_num:n #1
+  {
+    \use:c
+      {
+        g_examwsolns_
+        \examwsolns_name_for_level:n {#1}
+        _indent_dim
+      }
+  }
+
+% Desired
+\int_new:N \l__examwsolns_question_level_int
+\dim_new:N \l__examwsolns_total_indent_dim
+% Current
+\int_new:N \l__examwsolns_currlevel_int
+\dim_new:N \l__examwsolns_currlevel_total_indent_dim
+
+% Start command for the 'wsolution' environment.
+%
+% #1: desired question level (0 for 'outer', 1 for 'question' , 2 for 'part',
+%     3 for 'subpart', and 4 for 'subsubpart').
+%     Fully expanded; if blank, use the current level.
+% #2: additional arguments to pass to the 'mdframed' environment
+\cs_new_protected:Npn \examwsolns_start_wsolution:nn #1#2
+  {
+    % Determine the current question level
+    \cs_if_exist:cTF { @queslevel }
+      {
+        % We might want to reject the 'outer' level in this precise call, but
+        % reasons for doing so are rather weak (if exam.cls decided to set
+        % \@queslevel to 'outer' outside its question, etc. environments, I
+        % don't see how that could cause us any problem).
+        \examwsolns_check_question_level_name:x { \use:c { @queslevel } }
+        \str_set:Nx \l_tmpa_str { \use:c { @queslevel } }
+      }
+      { \str_set:Nn \l_tmpa_str { outer } } % outside any question environment
+
+    % Compute the current question level number, store it in \l_tmpa_str
+    \str_set:Nx \l_tmpb_str { \examwsolns_level_for_name:V \l_tmpa_str }
+    % Finally, store it in an <integer> variable
+    \int_set:Nn \l__examwsolns_currlevel_int { \l_tmpb_str }
+    \dim_set:Nn \l__examwsolns_currlevel_total_indent_dim
+      {
+        \examwsolns_total_indent_for_level_num:n
+          { \l__examwsolns_currlevel_int }
+      }
+
+    \tl_if_blank:nTF {#1}
+      {
+        \int_set_eq:NN \l__examwsolns_question_level_int
+                       \l__examwsolns_currlevel_int
+      }
+      {
+        \examwsolns_check_question_level_num:x {#1}
+        \int_set:Nn \l__examwsolns_question_level_int {#1}
+      }
+
+    \dim_set:Nn \l__examwsolns_total_indent_dim
+      {
+        \examwsolns_total_indent_for_level_num:n
+          { \l__examwsolns_question_level_int }
+      }
+
+    \dim_set:Nn \l_tmpa_dim
+      {
+        \l__examwsolns_total_indent_dim -
+        \l__examwsolns_currlevel_total_indent_dim
+      }
+
+    \mdframed [leftmargin = \l_tmpa_dim, #2]
+    \textbf { Solution \tl_to_str:n { : } }
+    \enspace
+    \ignorespaces
+  }
+
+\cs_generate_variant:Nn \examwsolns_start_wsolution:nn { nV }
+
+\cs_new_protected:Nn \examwsolns_end_wsolution:
+  {
+    \unskip
+    \endmdframed
+    \par
+    \ignorespacesafterend
+  }
+
+% The 2019-03-05 release of xparse provides a nicer way to do that (see
+% <https://tex.stackexchange.com/a/172426/73317>), but this is probabbly too
+% recent for users.
+\NewEnviron { wsolutionEnviron } [2]
+  {
+    \ifprintanswers
+      \examwsolns_start_wsolution:nV {#1} #2
+      \BODY
+      \examwsolns_end_wsolution:
+    \fi
+  }
+
+% See documentation of \examwsolns_start_wsolution:n above.
+\NewDocumentEnvironment { wsolution } { O{} o }
+  {
+    % Find the additional arguments to pass to \mdframed
+    \tl_set:Nx \l_tmpa_tl
+      {
+        \exp_args:Nnno
+        \IfValueTF {#2} {#2} { \l_examwsolns_mdframed_default_args_tl }
+      }
+
+    \wsolutionEnviron {#1} \l_tmpa_tl
+  }
+  { \endwsolutionEnviron }
+
+% Local assignment -> respects grouping
+\cs_new_protected:Npn \examwsolns_set_mdframed_default_args:n #1
+  {
+    \tl_set:Nn \l_examwsolns_mdframed_default_args_tl {#1}
+  }
+
+\NewDocumentCommand \examwsolnsSetMdFramedDefaultArgs { m }
+  {
+    \examwsolns_set_mdframed_default_args:n {#1}
+  }
+
+% Whether to replace the 'solution' environment
+\bool_new:N \l__examwsolns_replace_solution_env_bool
+
+\keys_define:nn { examwsolns }
+  {
+    replace-solution-env .bool_set:N = \l__examwsolns_replace_solution_env_bool,
+    replace-solution-env .initial:n = { false },
+    replace-solution-env .default:n = { true }
+  }
+
+\NewDocumentCommand \examwsolnsSetup { m }
+  {
+    \keys_set:nn { examwsolns } {#1}
+  }
+
+\AtBeginDocument
+  {
+    % Replace the 'solution' environment if 'replace-solution-env' or
+    % 'replace-solution-env=true' was passed as a package option or to
+    % \examwsolnsSetup.
+    \bool_if:nT \l__examwsolns_replace_solution_env_bool
+      {
+        \cs_gset_eq:NN \solution \wsolution
+        \cs_gset_eq:NN \endsolution\endwsolution
+      }
+  }
+
+% Process LaTeX2e-style package options. This uses l3keys2e, see
+% <https://tex.stackexchange.com/a/371754/73317> for explanations.
+\ProcessKeysPackageOptions { examwsolns }
+
+\endinput

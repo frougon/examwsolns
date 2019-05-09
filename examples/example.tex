@@ -1,0 +1,117 @@
+\documentclass[answers]{exam}
+\usepackage[framemethod=tikz]{mdframed}
+%\usepackage[replace-solution-env]{examwsolns}
+\usepackage{examwsolns}
+\usepackage{xcolor}
+\usepackage{lipsum}
+\usepackage{tikz}
+
+% Also possible in the preamble:
+% \examwsolnsSetup{replace-solution-env}
+% \examwsolnsSetup{replace-solution-env=true}
+
+% Default additional arguments to pass to the 'mdframed' environment
+\examwsolnsSetMdFramedDefaultArgs{
+  skipabove = \baselineskip,
+  innertopmargin = \baselineskip,
+  innerbottommargin = \baselineskip,
+  userdefinedwidth = \linewidth
+}
+
+\begin{document}
+Here is a full line:
+\par\noindent\hrulefill
+
+\begin{wsolution}
+  Autodetected outer level.
+\end{wsolution}
+
+\begin{questions}
+  \question A question.
+
+    \begin{wsolution}
+      Autodetected question level.
+    \end{wsolution}
+
+    \begin{parts}
+       \part A part
+         \begin{wsolution}[][innertopmargin = 2\baselineskip,
+                             innerbottommargin = 2\baselineskip,
+                             backgroundcolor=gray!40,
+                             roundcorner=8pt]
+           Autodetected part level.
+         \end{wsolution}
+
+         \begin{subparts}
+            \subpart A subpart
+              \begin{wsolution}
+                Autodetected subpart level.
+              \end{wsolution}
+
+             \subpart
+               \begin{subsubparts}
+                 \subsubpart A subsubpart
+                   \begin{wsolution}
+                     Autodetected subsubpart level.
+                   \end{wsolution}
+
+                 \subsubpart Another subsubpart
+                   \begin{wsolution}
+                     Autodetected subsubpart level.
+                   \end{wsolution}
+               \end{subsubparts}
+          \end{subparts}
+
+       \part Other part
+         \begin{wsolution}
+           Autodetected part level.
+         \end{wsolution}
+    \end{parts}
+
+  \question Other question
+    \begin{wsolution}
+      Autodetected question level.
+    \end{wsolution}
+
+    \begin{parts}
+      \part A part
+        \begin{wsolution}[1]
+          Forced at level 1.
+        \end{wsolution}
+
+        \begin{wsolution}[2]
+          Forced at level 2.
+        \end{wsolution}
+
+        \begin{wsolution}[3]
+          Forced at level 3. \lipsum[2-8]
+        \end{wsolution}
+
+        \begin{wsolution}[4]
+          Forced at level 4.
+
+          \lipsum[9-10]
+        \end{wsolution}
+
+        \begin{wsolution}[3]
+          Forced at level 3.
+        \end{wsolution}
+
+        \begin{wsolution}[2]
+          Forced at level 2.
+        \end{wsolution}
+    \end{parts}
+
+  \question Last question
+    \begin{wsolution}[1]
+      Forced at level 1.
+    \end{wsolution}
+
+    \begin{wsolution}[0]
+      Forced at level 0.
+    \end{wsolution}
+\end{questions}
+
+Here is a full line for comparison:
+\par\noindent\hrulefill
+\end{document}
