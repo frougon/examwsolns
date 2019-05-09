@@ -48,6 +48,19 @@
 \dim_new:N \g_examwsolns_subpart_indent_dim
 \dim_new:N \g_examwsolns_subsubpart_indent_dim
 \tl_new:N \l_examwsolns_mdframed_default_args_tl
+% Inserted after opening the 'mdframed' environment
+\tl_new:N \l_examwsolns_mdframed_pre_text_tl
+% Inserted before closing the 'mdframed' environment
+\tl_new:N \l_examwsolns_mdframed_post_text_tl
+
+% Default values
+\tl_set:Nn \l_examwsolns_mdframed_pre_text_tl
+  {
+    \textbf { Solution \tl_to_str:n { : } }
+    \enspace
+    \ignorespaces
+  }
+\tl_set:Nn \l_examwsolns_mdframed_post_text_tl { \unskip }
 
 % For each question level, compute the indentation starting from the left
 % margin based on the label widths used in exam.cls.
@@ -249,16 +262,14 @@
       }
 
     \mdframed [leftmargin = \l_tmpa_dim, #2]
-    \textbf { Solution \tl_to_str:n { : } }
-    \enspace
-    \ignorespaces
+    \tl_use:N \l_examwsolns_mdframed_pre_text_tl
   }
 
 \cs_generate_variant:Nn \examwsolns_start_wsolution:nn { nV }
 
 \cs_new_protected:Nn \examwsolns_end_wsolution:
   {
-    \unskip
+    \tl_use:N \l_examwsolns_mdframed_post_text_tl
     \endmdframed
     \par
     \ignorespacesafterend
@@ -299,6 +310,30 @@
 \NewDocumentCommand \examwsolnsSetMdFramedDefaultArgs { m }
   {
     \examwsolns_set_mdframed_default_args:n {#1}
+  }
+
+% Define tokens that are automatically inserted after opening the 'mdframed'
+% environment
+\cs_new_protected:Npn \examwsolns_set_mdframed_pre_text:n #1
+  {
+    \tl_set:Nn \l_examwsolns_mdframed_pre_text_tl {#1}
+  }
+
+\NewDocumentCommand \examwsolnsSetMdFramedPreText { m }
+  {
+    \examwsolns_set_mdframed_pre_text:n {#1}
+  }
+
+% Define tokens that are automatically inserted after closing the 'mdframed'
+% environment
+\cs_new_protected:Npn \examwsolns_set_mdframed_post_text:n #1
+  {
+    \tl_set:Nn \l_examwsolns_mdframed_post_text_tl {#1}
+  }
+
+\NewDocumentCommand \examwsolnsSetMdFramedPostText { m }
+  {
+    \examwsolns_set_mdframed_post_text:n {#1}
   }
 
 % Whether to replace the 'solution' environment

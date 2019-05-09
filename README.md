@@ -1,4 +1,4 @@
-# examwsolns — Environment for typesetting solutions with autodetected or customizable indentation level
+# examwsolns — Typesetting solutions with the `exam` class
 
 The `examwsolns` package provides a `wsolution` environment for the
 `exam` LaTeX document class. This environment can automatically adapt
@@ -23,6 +23,8 @@ hook in order to avoid problems due to package loading order).
 
 ## The `wsolution` environment
 
+### Question level
+
 The `wsolution` environment takes two optional arguments. If the first
 argument is passed and non-empty, it must be an integer in the [0, 4]
 range and gives the amount of indentation (and thus the width) of the
@@ -39,6 +41,8 @@ If this first argument is omitted or blank, the `wsolution` environment
 takes appropriate indentation and width for the current question level
 (which can be any of the five aforementioned levels).
 
+### Options passed to the `mdframed` environment
+
 The `mdframed` environment is passed the `leftmargin` parameter
 according to what we just explained, plus additional parameters that
 are:
@@ -53,9 +57,38 @@ are:
     argument and `\examwsolnsSetMdFramedDefaultArgs` hasn't been called
     in an accessible scope.
 
-Finally, `wsolution` environments are ignored unless the `answers`
-option has been passed to the `exam` class (in other words, the
-`wsolution` environment respects the `\ifprintanswers` conditional).
+### Pre-text and post-text inside `mdframed`
+
+The contents of a `wsolution` environment becomes the contents of an
+`mdframed` environment, except that you can have automatic pre-text and
+post-text inserted. For example, if you say
+`\examwsolnsSetMdFramedPreText{pre-text:}`,
+`\examwsolnsSetMdFramedPostText{:post-text}` and use, in a scope
+where these definitions are visible:
+
+    \begin{wsolution}Solution text\end{wsolution}
+
+then the `mdframed` environment (if printed) will have
+`pre-text:Solution text:post-text` as its contents.
+`\examwsolnsSetMdFramedPreText` and `\examwsolnsSetMdFramedPostText`
+obey TeX's scoping rules (they respect groups), just like a `\def`
+command. When used, the `\examwsolnsSetMdFramedPreText` and
+`\examwsolnsSetMdFramedPostText` commands override the default values
+defined in `examwsolns.sty`. These default values are equivalent to
+doing:
+
+    \examwsolnsSetMdFramedPreText{%
+      \textbf{Solution:}\enspace \ignorespaces}
+
+and
+
+    \examwsolnsSetMdFramedPostText{\unskip}
+
+### Showing or hiding answers
+
+`wsolution` environments are ignored unless the `answers` option has
+been passed to the `exam` class (in other words, the `wsolution`
+environment respects the `\ifprintanswers` conditional).
 
 ## The five indentation amounts
 
@@ -64,6 +97,8 @@ five question levels are accessible via the following `〈dimen〉`
 parameters: `\examwsolnsOuterIndent`, `\examwsolnsQuestionIndent`,
 `\examwsolnsPartIndent`, `\examwsolnsSubpartIndent` and
 `\examwsolnsSubsubpartIndent`.
+
+## About the `examwsolns` package
 
 The `examwsolns` package was written to answer [this TeX.SE
 question][question]. You can find a sample `.tex` file showing to use

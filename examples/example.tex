@@ -90,12 +90,17 @@ Here is a full line:
         \begin{wsolution}[4]
           Forced at level 4.
 
-          \lipsum[9-10]
+          \lipsum[9]\lipsum[10][1-2]
         \end{wsolution}
 
+        {% \examwsolnsSetMdFramedPreText and \examwsolnsSetMdFramedPostText
+         % respect TeX's grouping rules.
+          \examwsolnsSetMdFramedPreText{\emph{Sample pre-text} $\langle$}%
+          \examwsolnsSetMdFramedPostText{$\rangle$ \emph{Sample post-text}}%
         \begin{wsolution}[3]
           Forced at level 3.
         \end{wsolution}
+        }
 
         \begin{wsolution}[2]
           Forced at level 2.
