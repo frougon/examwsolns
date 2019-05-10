@@ -105,5 +105,12 @@ question][question]. You can find a sample `.tex` file showing to use
 it and corresponding screenshots in [that answer][answer] (see also the
 `examples` subdirectory here).
 
+## License
+
+The `examwsolns` package is distributed under the conditions of the LaTeX
+Project Public License, either version 1.3 of this license or (at your
+option) any later version. See examwsolns.sty for the precise licensing
+information.
+
   [question]: https://tex.stackexchange.com/questions/489374/exam-creating-a-solution-environment-whose-width-is-set-by-an-optional-argument
   [answer]: https://tex.stackexchange.com/a/489424/73317
