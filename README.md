@@ -108,9 +108,10 @@ it and corresponding screenshots in [that answer][answer] (see also the
 ## License
 
 The `examwsolns` package is distributed under the conditions of the LaTeX
-Project Public License, either version 1.3 of this license or (at your
-option) any later version. See examwsolns.sty for the precise licensing
-information.
+Project Public License, either version 1.3 of this license or (at your option)
+any later version. See `examwsolns.sty` for the precise licensing information.
+The `LICENSE` file distributed with `examwsolns` contains the complete text of
+the LaTeX Project Public License version 1.3.
 
   [question]: https://tex.stackexchange.com/questions/489374/exam-creating-a-solution-environment-whose-width-is-set-by-an-optional-argument
   [answer]: https://tex.stackexchange.com/a/489424/73317
