@@ -98,12 +98,16 @@ parameters: `\examwsolnsOuterIndent`, `\examwsolnsQuestionIndent`,
 `\examwsolnsPartIndent`, `\examwsolnsSubpartIndent` and
 `\examwsolnsSubsubpartIndent`.
 
-## About the `examwsolns` package
+## Examples
+
+You can find a sample `.tex` file showing how to use `examwsolns` in the
+`examples` subdirectory and a [PDF rendering of that
+file](https://github.com/frougon/examwsolns/wiki/files/example.pdf).
+
+## History
 
 The `examwsolns` package was written to answer [this TeX.SE
-question][question]. You can find a sample `.tex` file showing to use
-it and corresponding screenshots in [that answer][answer] (see also the
-`examples` subdirectory here).
+question][question].
 
 ## License
 
