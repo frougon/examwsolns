@@ -165,15 +165,16 @@
 
 \cs_generate_variant:Nn \examwsolns_check_question_level_num:n { x }
 
-\cs_new_protected:Npn \examwsolns_total_indent_for_level_name:n #1
+% Expand to a <dimension>. Fully expandable, but doesn't check whether the
+% question level name is valid.
+\cs_new:Npn \examwsolns_total_indent_for_level_name:n #1
   {
-    \examwsolns_check_question_level_name:n {#1}
     \use:c { g_examwsolns_#1_indent_dim }
   }
 
 % Expand to a <dimension>. Fully expandable, but doesn't check whether the
 % question level is valid.
-\cs_new_protected:Npn \examwsolns_total_indent_for_level_num:n #1
+\cs_new:Npn \examwsolns_total_indent_for_level_num:n #1
   {
     \use:c
       {
