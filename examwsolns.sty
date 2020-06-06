@@ -91,11 +91,11 @@
 \dim_gset_eq:NN \g_examwsolns_subsubpart_indent_dim \l_tmpa_dim
 
 % Make these computed <dimen> user-accessible
-\cs_gset_eq:NN \examwsolnsOuterIndent \g_examwsolns_outer_indent_dim
-\cs_gset_eq:NN \examwsolnsQuestionIndent \g_examwsolns_question_indent_dim
-\cs_gset_eq:NN \examwsolnsPartIndent \g_examwsolns_part_indent_dim
-\cs_gset_eq:NN \examwsolnsSubpartIndent \g_examwsolns_subpart_indent_dim
-\cs_gset_eq:NN \examwsolnsSubsubpartIndent \g_examwsolns_subsubpart_indent_dim
+\cs_new_eq:NN \examwsolnsOuterIndent \g_examwsolns_outer_indent_dim
+\cs_new_eq:NN \examwsolnsQuestionIndent \g_examwsolns_question_indent_dim
+\cs_new_eq:NN \examwsolnsPartIndent \g_examwsolns_part_indent_dim
+\cs_new_eq:NN \examwsolnsSubpartIndent \g_examwsolns_subpart_indent_dim
+\cs_new_eq:NN \examwsolnsSubsubpartIndent \g_examwsolns_subsubpart_indent_dim
 
 % Expand to the numeric question level for outer, question, part, subpart or
 % subsubpart ('outer' being a pseudo-question level). Fully expandable.
