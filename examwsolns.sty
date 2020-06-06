@@ -36,9 +36,9 @@
 % *                     Messages emitted by the package                      *
 % ****************************************************************************
 \msg_new:nnn { examwsolns } { invalid-question-level-name }
-  { Invalid~question~level~name:~' \exp_not:n {#1} '. }
+  { Invalid~question~level~name:~'#1'. }
 \msg_new:nnn { examwsolns } { invalid-question-level-num }
-  { Invalid~question~level~number:~' \exp_not:n {#1} '. }
+  { Invalid~question~level~number:~'#1'. }
 
 % Variable declarations
 \dim_new:N \g_examwsolns_outer_indent_dim
@@ -101,13 +101,17 @@
 % subsubpart ('outer' being a pseudo-question level). Fully expandable.
 \cs_new:Npn \examwsolns_level_for_name:n #1
   {
-    \str_case:nn {#1}
+    \str_case:nnF {#1}
       {
         { outer }      { 0 }
         { question }   { 1 }
         { part }       { 2 }
         { subpart }    { 3 }
         { subsubpart } { 4 }
+      }
+      {
+        \msg_expandable_error:nnn { examwsolns }
+          { invalid-question-level-name } {#1}
       }
   }
 
@@ -145,13 +149,17 @@
 % Fully expandable.
 \cs_new:Npn \examwsolns_name_for_level:n #1
   {
-    \int_case:nn {#1}
+    \int_case:nnF {#1}
       {
         { 0 } { outer }
         { 1 } { question }
         { 2 } { part }
         { 3 } { subpart }
         { 4 } { subsubpart }
+      }
+      {
+        \msg_expandable_error:nnn { examwsolns }
+          { invalid-question-level-num } {#1}
       }
   }
 
