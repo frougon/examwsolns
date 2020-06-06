@@ -117,19 +117,6 @@
 
 \cs_generate_variant:Nn \examwsolns_level_for_name:n { V }
 
-\cs_new_protected:Npn \examwsolns_level_for_name_with_check:n #1
-  {
-    \str_case:nnF {#1}
-      {
-        { outer }      { 0 }
-        { question }   { 1 }
-        { part }       { 2 }
-        { subpart }    { 3 }
-        { subsubpart } { 4 }
-      }
-      { \msg_error:nnn { examwsolns } { invalid-question-level-name } {#1} }
-  }
-
 \cs_new_protected:Npn \examwsolns_check_question_level_name:n #1
   {
     \str_case:nnF {#1}
@@ -161,19 +148,6 @@
         \msg_expandable_error:nnn { examwsolns }
           { invalid-question-level-num } {#1}
       }
-  }
-
-\cs_new_protected:Npn \examwsolns_name_for_level_with_check:n #1
-  {
-    \int_case:nnF {#1}
-      {
-        { 0 } { outer }
-        { 1 } { question }
-        { 2 } { part }
-        { 3 } { subpart }
-        { 4 } { subsubpart }
-      }
-      { \msg_error:nnn { examwsolns } { invalid-question-level-num } {#1} }
   }
 
 \cs_new_protected:Npn \examwsolns_check_question_level_num:n #1
