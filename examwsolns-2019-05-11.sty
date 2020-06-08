@@ -21,17 +21,14 @@
 % This package provides a 'wsolution' environment for the 'exam' class. See
 % the README.md file for details.
 %
-\NeedsTeXFormat{LaTeX2e}[2018-04-01]
-\DeclareRelease{}{2019-05-11}{examwsolns-2019-05-11.sty}
-\DeclareCurrentRelease{}{2020-06-08}
-
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
 \RequirePackage{expl3}
 \RequirePackage{xparse}
 \RequirePackage{l3keys2e}
 % 'environ' won't be needed anymore when we can use xparse from 2019-03-05.
 \RequirePackage{environ}
 
-\ProvidesExplPackage{examwsolns}{2020-06-08}{0.3}
+\ProvidesExplPackage{examwsolns}{2019-05-11}{0.2}
                     {Environment for typesetting solutions with autodetected
                      or customizable indentation level}
 
@@ -278,9 +275,8 @@
     % Find the additional arguments to pass to \mdframed
     \tl_set:Nx \l_tmpa_tl
       {
-        \IfValueTF {#2}
-          { \exp_not:n {#2} }
-          { \exp_not:V \l_examwsolns_mdframed_default_args_tl }
+        \exp_args:Nnno
+        \IfValueTF {#2} {#2} { \l_examwsolns_mdframed_default_args_tl }
       }
 
     \wsolutionEnviron {#1} \l_tmpa_tl
