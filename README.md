@@ -7,13 +7,19 @@ subpart or subsubpart).
 
 ## Package options
 
-The `examwsolns` package accepts only one option:
-`replace-solution-env`. Using it as `replace-solution-env` or as
-`replace-solution-env=true` is equivalent. The default is `false`. When
-`true`, it tells `examwsolns` to redefine the `solution` environment to
-be identical to `wsolution`.
+The `examwsolns` package accepts the following options:
 
-Package options (well... *the* option) can also be specified with:
+- `default-level=current|outer|question|part|subpart|subsubpart` (the default
+  is `current`). When the first argument of a `wsolution` environment is
+  blank, the given level is used to determine the indentation and width of the
+  environment.
+
+- `replace-solution-env`. Using it as `replace-solution-env` or as
+  `replace-solution-env=true` is equivalent. The default is `false`. When
+  `true`, it tells `examwsolns` to redefine the `solution` environment to
+  be identical to `wsolution`.
+
+Package options can also be specified with:
 
     \examwsolnsSetup{<options>}
 
@@ -38,8 +44,11 @@ produced `mdframed`;
   - the value 4 corresponds to the `subsubpart` level.
 
 If this first argument is omitted or blank, the `wsolution` environment
-takes appropriate indentation and width for the current question level
-(which can be any of the five aforementioned levels).
+takes appropriate indentation and width:
+
+  - as indicated by option `default-level` if its value is not `current`;
+  - for the current question level otherwise (which can be any of the five
+    aforementioned levels).
 
 ### Options passed to the `mdframed` environment
 

@@ -31,13 +31,17 @@
 % 'environ' won't be needed anymore when we can use xparse from 2019-03-05.
 \RequirePackage{environ}
 
-\ProvidesExplPackage{examwsolns}{2020-06-08}{0.3}
+\ProvidesExplPackage{examwsolns}{2020-07-31}{0.4}
                     {Environment for typesetting solutions with autodetected
                      or customizable indentation level}
 
 % ****************************************************************************
 % *                     Messages emitted by the package                      *
 % ****************************************************************************
+\msg_new:nnn { examwsolns } { unknown-choice-for-option }
+  {
+    Invalid~value~for~option~'#1':~'#3'~(valid~choices~are~#2).
+  }
 \msg_new:nnn { examwsolns } { invalid-question-level-name }
   { Invalid~question~level~name:~'#1'. }
 \msg_new:nnn { examwsolns } { invalid-question-level-num }
@@ -193,12 +197,16 @@
 % Current
 \int_new:N \l__examwsolns_currlevel_int
 \dim_new:N \l__examwsolns_currlevel_total_indent_dim
+% Default question level if 'default-level' has been passed with a value among
+% outer|question|part|subpart|subsubpart, else -1.
+\int_new:N \l__examwsolns_default_question_level_int
 
 % Start command for the 'wsolution' environment.
 %
 % #1: desired question level (0 for 'outer', 1 for 'question' , 2 for 'part',
 %     3 for 'subpart', and 4 for 'subsubpart').
-%     Fully expanded; if blank, use the current level.
+%     Fully expanded; if blank and 'default-level' has been provided, use the
+%     given level; otherwise, use the current level.
 % #2: additional arguments to pass to the 'mdframed' environment
 \cs_new_protected:Npn \examwsolns_start_wsolution:nn #1#2
   {
@@ -214,7 +222,7 @@
       }
       { \str_set:Nn \l_tmpa_str { outer } } % outside any question environment
 
-    % Compute the current question level number, store it in \l_tmpa_str
+    % Compute the current question level number, store it in \l_tmpb_str
     \str_set:Nx \l_tmpb_str { \examwsolns_level_for_name:V \l_tmpa_str }
     % Finally, store it in an <integer> variable
     \int_set:Nn \l__examwsolns_currlevel_int { \l_tmpb_str }
@@ -226,8 +234,13 @@
 
     \tl_if_blank:nTF {#1}
       {
-        \int_set_eq:NN \l__examwsolns_question_level_int
-                       \l__examwsolns_currlevel_int
+        \int_set:Nn \l__examwsolns_question_level_int
+          {
+            \int_compare:nNnTF
+              { \l__examwsolns_default_question_level_int } = { -1 }
+              { \l__examwsolns_currlevel_int }
+              { \l__examwsolns_default_question_level_int }
+          }
       }
       {
         \examwsolns_check_question_level_num:x {#1}
@@ -327,6 +340,20 @@
 
 \keys_define:nn { examwsolns }
   {
+    default-level .choices:nn =
+      { current, outer, question, part, subpart, subsubpart }
+      {
+        \int_set:Nn \l__examwsolns_default_question_level_int
+          { \l_keys_choice_int - 2 }
+      },
+    default-level / unknown .code:n =
+      {
+        \msg_fatal:nnnnn { examwsolns } { unknown-choice-for-option }
+          { default-level }         % key name
+          { 'current',~'outer',~'question',~'part',~'subpart',~and~'subsubpart' }
+          {#1}                    % what the user passed
+      },
+    default-level .initial:n = { current },
     replace-solution-env .bool_set:N = \l__examwsolns_replace_solution_env_bool,
     replace-solution-env .initial:n = { false },
     replace-solution-env .default:n = { true }
